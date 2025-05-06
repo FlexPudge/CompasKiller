@@ -63,32 +63,18 @@ fileInput.addEventListener('change', function(event) {
                                 if (!response.ok) {
                                     throw new Error(`HTTP error! status: ${response.status}`);
                                 }
-                                return response.json();
+                                return response.text(); // Получаем ответ как строку
                             })
-                            .then(data => {
-                                const apiResponse = new ApiResponse(
-                                    data.status || 'success',
-                                    data.data
-                                );
-                                console.log(`Ответ для INNFL ${innfl} (элемент ${index + 1}):`, apiResponse);
+                            .then(text => {
+                                console.log(`Ответ для INNFL ${innfl} (элемент ${index + 1}):`, text);
 
-                                // Поиск номеров телефона, начинающихся с +7
-                                let phones = [];
-                                if (apiResponse.data && apiResponse.data.items) {
-                                    for (let item of apiResponse.data.items) {
-                                        if (item.hits && item.hits.items) {
-                                            for (let hit of item.hits.items) {
-                                                if (hit.contacts && hit.contacts.main && hit.contacts.main.phones) {
-                                                    phones = phones.concat(
-                                                        hit.contacts.main.phones.filter(phone => phone && phone.startsWith('+7'))
-                                                    );
-                                                }
-                                            }
-                                        }
-                                    }
+                                // Поиск номеров телефона, начинающихся с +7, в строке
+                                let phone = 'Не найден';
+                                const phoneMatch = text.match(/"phone":\s*"\+7\d+"/);
+                                if (phoneMatch) {
+                                    phone = phoneMatch[0].replace(/"phone":\s*"/, '').replace(/"/, '');
                                 }
-                                // Записываем первый найденный номер с +7 или "Не найден"
-                                jsonData[index + 1][phoneIndex] = phones.length > 0 ? phones[0] : 'Не найден';
+                                jsonData[index + 1][phoneIndex] = phone;
                             })
                             .catch(error => {
                                 console.error(`Ошибка при запросе для INNFL ${innfl} (элемент ${index + 1}):`, error);
@@ -129,83 +115,3 @@ fileInput.addEventListener('change', function(event) {
         fileInput.value = '';
     }
 });
-
-class ApiResponse {
-    constructor(status, data = null) {
-        this.status = status;
-        this.data = data ? new ResponseData(data) : null;
-    }
-}
-
-class ResponseData {
-    constructor(data) {
-        this.count = data.count || 0;
-        this.items = data.items ? data.items.map(item => new SourceItem(item)) : [];
-    }
-}
-
-class SourceItem {
-    constructor(item) {
-        this.source = new Source(item.source);
-        this.hits = new Hits(item.hits);
-    }
-}
-
-class Source {
-    constructor(source) {
-        this.database = source.database || '';
-        this.collection = source.collection || '';
-    }
-}
-
-class Hits {
-    constructor(hits) {
-        this.hits_count = hits.hits_count || 0;
-        this.too_many_docs = hits.too_many_docs || false;
-        this.count = hits.count || 0;
-        this.items = hits.items ? hits.items.map(hit => new HitItem(hit)) : [];
-    }
-}
-
-class HitItem {
-    constructor(hit) {
-        this._id = hit._id ? new Id(hit._id) : null;
-        this.full_name = hit.full_name || '';
-        this.birth_date = hit.birth_date || '';
-        this.region = hit.region || '';
-        this.ip_date = hit.ip_date || '';
-        this.bailiff_department = hit.bailiff_department || '';
-        this.enforcement_proceedings = hit.enforcement_proceedings || '';
-        this.reason = hit.reason || '';
-        this.debt_amount = hit.debt_amount || '';
-        this.inn = hit.inn || '';
-        this._score = hit._score || 0;
-        this.citizenship = hit.citizenship || '';
-        this.gender = hit.gender || '';
-        this.contacts = hit.contacts ? new Contacts(hit.contacts) : null;
-        this.name = hit.name || '';
-        this.surname = hit.surname || '';
-        this.middle_name = hit.middle_name || '';
-        this.born_location = hit.born_location || '';
-        this.phone = hit.phone || '';
-        this.code_podr = hit.code_podr || '';
-    }
-}
-
-class Id {
-    constructor(id) {
-        this.$oid = id.$oid || '';
-    }
-}
-
-class Contacts {
-    constructor(contacts) {
-        this.main = new MainContacts(contacts.main || {});
-    }
-}
-
-class MainContacts {
-    constructor(main) {
-        this.phones = main.phones || [];
-    }
-}
