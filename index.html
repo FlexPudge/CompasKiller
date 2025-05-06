@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сегменты</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <a href="index.html"><button class="active">Своя база</button></a>
+            <a href="pohui.html"><button>Создать выгрузку</button></a>
+        </div>
+    </div>
+    <div class="main">
+        <div class="content-wrapper">
+            <div class="content">
+                <div class="create-segment">
+                    <div class="plus">+</div>
+                    <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+                </div>
+            </div>
+            <div class="file-info" id="fileInfo"></div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="footer-left">
+            УБИЙЦА КОНТУР КОМПАСА
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
