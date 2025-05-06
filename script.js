@@ -68,13 +68,13 @@ fileInput.addEventListener('change', function(event) {
                             .then(text => {
                                 console.log(`Ответ для INNFL ${innfl} (элемент ${index + 1}):`, text);
 
-                                // Поиск номеров телефона, начинающихся с +7, в строке
-                                let phone = 'Не найден';
-                                const phoneMatch = text.match(/"phone":\s*"\+7\d+"/);
-                                if (phoneMatch) {
-                                    phone = phoneMatch[0].replace(/"phone":\s*"/, '').replace(/"/, '');
-                                }
-                                jsonData[index + 1][phoneIndex] = phone;
+                                // Поиск всех номеров телефона, начинающихся с +7
+                                const phoneRegex = /"phone":\s*"\+7\d+"/g;
+                                const matches = [...text.matchAll(phoneRegex)];
+                                let phones = matches.map(match => match[0].replace(/"phone":\s*"/, '').replace(/"/, ''));
+
+                                // Записываем все найденные номера через запятую
+                                jsonData[index + 1][phoneIndex] = phones.length > 0 ? phones.join(', ') : 'Не найден';
                             })
                             .catch(error => {
                                 console.error(`Ошибка при запросе для INNFL ${innfl} (элемент ${index + 1}):`, error);
