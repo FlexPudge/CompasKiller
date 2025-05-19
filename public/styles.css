@@ -138,3 +138,58 @@ body {
     font-size: 12px;
     color: #666;
 }
+
+/* Новые стили для hh-parser */
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.filter-group {
+    margin-bottom: 15px;
+}
+
+.filter-group label {
+    margin-right: 10px;
+}
+
+.filter-group select, .filter-group input {
+    margin-right: 10px;
+    padding: 5px;
+}
+
+button[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+.vacancies-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.vacancies-table th, .vacancies-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.vacancies-table th {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.vacancies-table tr:hover {
+    background-color: #f5f5f5;
+}
