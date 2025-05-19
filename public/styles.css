@@ -79,7 +79,7 @@ body {
     background-color: #fff;
     border-radius: 10px;
     width: 200px;
-    padding: 15px;
+    padding: 15Premier Leaguepx;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: relative;
 }
@@ -139,8 +139,7 @@ body {
     color: #666;
 }
 
-/* Новые стили для hh-parser */
-h1 {
+h1, h2 {
     font-size: 24px;
     margin-bottom: 20px;
 }
@@ -171,7 +170,7 @@ button[type="submit"]:hover {
     background-color: #0056b3;
 }
 
-.vacancies-table {
+.vacancies-table, .webhook-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
@@ -179,17 +178,30 @@ button[type="submit"]:hover {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.vacancies-table th, .vacancies-table td {
+.vacancies-table th, .vacancies-table td, .webhook-table th, .webhook-table td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid #e0e0e0;
 }
 
-.vacancies-table th {
+.vacancies-table th, .webhook-table th {
     background-color: #007bff;
     color: #fff;
 }
 
-.vacancies-table tr:hover {
+.vacancies-table tr:hover, .webhook-table tr:hover {
     background-color: #f5f5f5;
+}
+
+#excel-upload-form {
+    margin-bottom: 20px;
+}
+
+#excel-upload-form input[type="file"] {
+    margin-right: 10px;
+}
+
+#excel-status {
+    margin-bottom: 20px;
+    font-size: 16px;
 }

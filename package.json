@@ -1,7 +1,7 @@
 {
     "name": "pipegen",
     "version": "1.0.0",
-    "description": "Веб-приложение для обработки Excel и парсинга HH",
+    "description": "Веб-приложение для обработки Excel, вебхуков и парсинга HH",
     "main": "server.js",
     "scripts": {
         "start": "node server.js"
@@ -10,7 +10,9 @@
         "axios": "^1.7.2",
         "csv-stringify": "^6.4.0",
         "dotenv": "^16.4.5",
+        "exceljs": "^4.4.0",
         "express": "^4.19.2",
+        "multer": "^1.4.5-lts.1",
         "node-fetch": "^2.7.0",
         "xlsx": "^0.18.5"
     }
