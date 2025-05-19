@@ -10,3 +10,5 @@
 2025-05-19T16:49:21.153Z: Ошибка: Файл не загружен
 2025-05-19T16:49:46.829Z: Ошибка при обработке файла: Can't find end of central directory : is this a zip file ? If it is, see https://stuk.github.io/jszip/documentation/howto/read_zip.html
 2025-05-19T16:50:17.675Z: HH: CSV сформирован, 100 записей
+2025-05-19T17:04:38.542Z: HH: CSV сформирован, 100 записей
+2025-05-19T17:05:11.234Z: HH: CSV сформирован, 100 записей

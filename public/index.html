@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Сегменты</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Своя база</title>
+    <link rel="stylesheet" href="/styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
     <div class="header">
         <div class="header-left">
-            <a href="index.html"><button class="active">Своя база</button></a>
-            <a href="/hh-parser"><button>Парсер HH</button></a>
-            <a href="/webhooks"><button>Вебхуки</button></a>
+            <button class="active">Своя база</button>
+        </div>
+        <div class="header-right">
+            <a href="/webhooks"><button class="run-webhook">Запустить вебхуки</button></a>
         </div>
     </div>
     <div class="main">
         <div class="content-wrapper">
             <div class="content">
                 <div class="create-segment">
-                    <div class="plus">+</div>
+                    <span class="plus">+</span>
                     <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
                 </div>
             </div>
@@ -27,10 +28,9 @@
         </div>
     </div>
     <div class="footer">
-        <div class="footer-left">
-            УБИЙЦА КОНТУР КОМПАСА
-        </div>
+        <div class="footer-left">УБИЙЦА КОНТУР КОМПАСА</div>
     </div>
-    <script src="script.js"></script>
+    <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+    <script src="/script.js"></script>
 </body>
 </html>

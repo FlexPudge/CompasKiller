@@ -113,73 +113,34 @@ if (createSegment && fileInput && fileInfo) {
     });
 }
 
-// Логика для страницы webhooks
-const excelUploadForm = document.getElementById('excel-upload-form');
-const excelStatus = document.getElementById('excel-status');
-const webhookTableBody = document.getElementById('webhook-table-body');
+// Логика для страницы /webhooks
+if (window.location.pathname === '/webhooks') {
+    const webhookForm = document.getElementById('webhook-form');
+    const excelStatus = document.getElementById('excel-status');
+    const webhookTableBody = document.getElementById('webhook-table-body');
 
-if (excelUploadForm && excelStatus && webhookTableBody) {
-    excelUploadForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const formData = new FormData(excelUploadForm);
-        fetch('/upload', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => {
-                if (!response.ok) throw new Error('Ошибка загрузки файла');
-                window.location.reload();
+    if (webhookForm && excelStatus && webhookTableBody) {
+        webhookForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(webhookForm);
+
+            fetch('/webhook-upload', {
+                method: 'POST',
+                body: formData
             })
-            .catch(error => {
-                console.error('Ошибка:', error);
-                excelStatus.innerHTML = `<p style="color: red;">Ошибка при загрузке файла: ${error.message}</p>`;
-            });
-    });
-
-    // Загрузка вебхуков
-    fetch('/api/webhooks')
-        .then(response => response.json())
-        .then(data => {
-            if (data.length === 0) {
-                webhookTableBody.innerHTML = '<tr><td colspan="5">Вебхуки пока не получены</td></tr>';
-            } else {
-                webhookTableBody.innerHTML = data.map(hook => `
-                    <tr>
-                        <td>${hook.id}</td>
-                        <td>${hook.phone}</td>
-                        <td>${hook.title}</td>
-                        <td>${hook.comments}</td>
-                        <td>${hook.timestamp}</td>
-                    </tr>
-                `).join('');
-            }
-        })
-        .catch(error => {
-            console.error('Ошибка загрузки вебхуков:', error);
-            webhookTableBody.innerHTML = '<tr><td colspan="5">Ошибка загрузки вебхуков</td></tr>';
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Ошибка загрузки файла');
+                    }
+                    return response.text();
+                })
+                .then(() => {
+                    window.location.reload(); // Обновляем страницу для отображения статуса
+                })
+                .catch(error => {
+                    excelStatus.textContent = `Ошибка: ${error.message}`;
+                    excelStatus.style.color = 'red';
+                });
         });
-
-    // Проверка статуса Excel
-    fetch('/api/excel-status')
-        .then(response => response.json())
-        .then(data => {
-            excelStatus.innerHTML = data.fileName
-                ? `<p>Excel-файл загружен: ${data.fileName}</p>`
-                : `<p>Excel-файл не загружен</p>`;
-        })
-        .catch(error => {
-            console.error('Ошибка проверки статуса Excel:', error);
-            excelStatus.innerHTML = `<p style="color: red;">Ошибка проверки статуса Excel</p>`;
-        });
-}
-
-// Логика для hh-parser
-const hhFilterForm = document.getElementById('hh-filter-form');
-if (hhFilterForm) {
-    hhFilterForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const formData = new FormData(hhFilterForm);
-        const queryString = new URLSearchParams(formData).toString();
-        window.location.href = `/hh-parser?${queryString}`;
-    });
+    }
 }

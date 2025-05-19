@@ -1,7 +1,7 @@
 {
     "name": "pipegen",
     "version": "1.0.0",
-    "description": "Веб-приложение для обработки Excel, вебхуков и парсинга HH",
+    "description": "Веб-приложение для обработки Excel с ИННФЛ и вебхуков",
     "main": "server.js",
     "scripts": {
         "start": "node server.js"

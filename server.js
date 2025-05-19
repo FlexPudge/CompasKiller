@@ -14,12 +14,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://your-app-domain.timeweb.cloud');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    next();
-});
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Настройка Multer
 const upload = multer({
@@ -89,23 +84,56 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Страница вебхуков
+// Страница вебхуков (HTML из webhook_server.js)
 app.get('/webhooks', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'webhooks.html'));
-});
+    const webhookTableRows = webhooks.length === 0
+        ? '<tr><td colspan="5">Вебхуки пока не получены</td></tr>'
+        : webhooks.map(w => `
+            <tr>
+                <td>${w.id}</td>
+                <td>${w.phone}</td>
+                <td>${w.title}</td>
+                <td>${w.comments}</td>
+                <td>${w.timestamp}</td>
+            </tr>
+        `).join('');
 
-// API для получения вебхуков
-app.get('/api/webhooks', (req, res) => {
-    res.json(webhooks);
-});
-
-// API для проверки статуса Excel
-app.get('/api/excel-status', (req, res) => {
-    res.json({ fileName: excelFileName });
+    res.send(`
+        <html>
+            <head>
+                <title>Сервер для обработки вебхуков</title>
+                <link rel="stylesheet" href="/styles.css">
+            </head>
+            <body>
+                <h1>Сервер для обработки вебхуков</h1>
+                <p>Отправляйте запросы на /webhook с параметрами fields[PHONE][0][VALUE], fields[TITLE], fields[COMMENTS]</p>
+                <p><a href="/hh-parser">Перейти к Парсеру HH</a> | <a href="/">Вернуться на главную</a></p>
+                <form id="webhook-form" enctype="multipart/form-data">
+                    <input type="file" name="excelFile" accept=".xlsx, .xls">
+                    <input type="submit" value="Загрузить Excel">
+                </form>
+                <p id="excel-status">${excelFileName ? `Excel-файл загружен: ${excelFileName}` : 'Excel-файл не загружен'}</p>
+                <h2>Полученные вебхуки</h2>
+                <table class="webhook-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Телефон</th>
+                            <th>Заголовок</th>
+                            <th>Комментарий</th>
+                            <th>Время</th>
+                        </tr>
+                    </thead>
+                    <tbody id="webhook-table-body">${webhookTableRows}</tbody>
+                </table>
+                <script src="/script.js"></script>
+            </body>
+        </html>
+    `);
 });
 
 // Маршрут для загрузки Excel
-app.post('/upload', upload, async (req, res) => {
+app.post('/webhook-upload', upload, async (req, res) => {
     try {
         const file = req.file;
         if (!file) {
@@ -167,12 +195,15 @@ app.all('/webhook', async (req, res) => {
                 }
             };
 
+            // Закомментировано, так как URL недействителен
+            /*
             try {
                 await axios.post(bitrixUrl, bitrixData);
                 logToFile(`Отправлен вебхук в Bitrix24: ${JSON.stringify(bitrixData)}`);
             } catch (error) {
                 logToFile(`Ошибка при отправке в Bitrix24: ${error.message}`);
             }
+            */
         } else {
             logToFile(`Совпадений телефона в Excel не найдено: ${phone}`);
         }
@@ -209,6 +240,19 @@ app.get('/hh-parser', async (req, res) => {
             logToFile('HH: Вакансии не найдены');
         }
 
+        const tableRows = vacancies.length === 0
+            ? '<tr><td colspan="6">Вакансии не найдены для заданных параметров</td></tr>'
+            : vacancies.map(v => `
+                <tr>
+                    <td>${v.id}</td>
+                    <td>${v.name}</td>
+                    <td>${v.employer.name}</td>
+                    <td>${v.area.name}</td>
+                    <td>${v.salary ? `${v.salary.from || ''} - ${v.salary.to || ''} ${v.salary.currency || ''}` : 'Не указана'}</td>
+                    <td>${new Date(v.published_at).toLocaleString('ru-RU')}</td>
+                </tr>
+            `).join('');
+
         const csvData = vacancies.map(v => ({
             ID: v.id,
             Название: v.name,
@@ -236,7 +280,45 @@ app.get('/hh-parser', async (req, res) => {
             logToFile(`HH: CSV сформирован, ${csvData.length} записей`);
         }
 
-        res.sendFile(path.join(__dirname, 'public', 'hh-parser.html'));
+        res.send(`
+            <html>
+                <head>
+                    <title>Парсер HH: Вакансии юристов</title>
+                    <link rel="stylesheet" href="/styles.css">
+                </head>
+                <body>
+                    <h1>Парсер HH: Вакансии юристов</h1>
+                    <p><a href="/webhooks">Вернуться на главную</a></p>
+                    <form action="/hh-parser" method="get">
+                        <label for="city">Город:</label>
+                        <select name="city" id="city">
+                            ${cities.map(c => `<option value="${c.id}" ${c.id === city ? 'selected' : ''}>${c.name}</option>`).join('')}
+                        </select>
+                        <label for="dateRange">Период:</label>
+                        <select name="dateRange" id="dateRange">
+                            <option value="1" ${dateRange === '1' ? 'selected' : ''}>1 день</option>
+                            <option value="7" ${dateRange === '7' ? 'selected' : ''}>7 дней</option>
+                            <option value="30" ${dateRange === '30' ? 'selected' : ''}>30 дней</option>
+                        </select>
+                        <input type="submit" value="Применить фильтры">
+                    </form>
+                    <p><a href="/download-vacancies">Скачать таблицу (CSV)</a></p>
+                    <table class="webhook-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Название</th>
+                                <th>Компания</th>
+                                <th>Город</th>
+                                <th>Зарплата</th>
+                                <th>Дата публикации</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </body>
+            </html>
+        `);
     } catch (error) {
         logToFile(`HH: Ошибка - ${error.message}`);
         res.status(500).send(`
@@ -245,7 +327,7 @@ app.get('/hh-parser', async (req, res) => {
                 <body>
                     <h1>Ошибка при получении вакансий</h1>
                     <p>Не удалось загрузить данные. Попробуйте позже или измените фильтры.</p>
-                    <a href="/hh-parser">Вернуться к парсеру</a> | <a href="/">На главную</a>
+                    <a href="/hh-parser">Вернуться к парсеру</a> | <a href="/webhooks">На главную</a>
                 </body>
             </html>
         `);
@@ -267,9 +349,6 @@ app.get('/download-vacancies', (req, res) => {
         res.status(404).send('Файл не найден или пуст');
     }
 });
-
-// Статические файлы
-app.use(express.static(path.join(__dirname, 'public')));
 
 app.listen(PORT, () => {
     console.log(`Сервер запущен на http://localhost:${PORT}`);
